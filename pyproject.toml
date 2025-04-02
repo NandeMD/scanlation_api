@@ -1,0 +1,23 @@
+[project]
+name = "new-sys"
+version = "0.1.0"
+description = "New Python Scanlation System"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.12",
+]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+strictListInference = true
+strictDictionaryInference = true
+strictSetInference = true
+deprecateTypingAliases = true
+typeCheckingMode = "strict"
+reportMissingTypeStubs = true
+reportWildcardImportFromLibrary = false
+reportMissingModuleSource = false
+reportUndefinedVariable = false
+ignore = ["*"]
