@@ -1,7 +1,24 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
+
+from app.dependencies.auth import CheckTokenDep
+from app.dependencies.helpers.auth import create_database
 from app.routers import main_router
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Code to run at startup
+    print("Starting up...")
+    create_database()
+
+    yield
+
+    # Code to run at shutdown
+    print("Shutting down...")
+
+app = FastAPI(lifespan=lifespan)
 app.include_router(main_router)
 
 
@@ -11,6 +28,6 @@ def read_root():
 
 
 @app.get("/items/{item_id}")
-def read_item(item_id: int, q: str | None = None):
+def read_item(_: CheckTokenDep, item_id: int, q: str | None = None):
     return {"item_id": item_id, "q": q}
 
