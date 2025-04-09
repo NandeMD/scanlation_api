@@ -7,7 +7,7 @@ from jwt.exceptions import InvalidTokenError
 from sqlmodel import Session
 
 from app.models.auth import TokenData
-from app.models.user import UserInDB
+from app.models.db_tables import UserInDB
 
 from .helpers.auth import get_database_session, get_user
 
