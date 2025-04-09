@@ -18,7 +18,7 @@ class RoleInDiscord(str, Enum):
     SIDE_ADMIN = "sideadmin"
 
 class User(SQLModel):
-    id: int = Field(default=None, primary_key=True)
+    id: int = Field(default=None, primary_key=True, unique=True)
     username: str = Field(index=True, unique=True)
     email: str = Field(index=True, unique=True)
     discord_id: str = Field(index=True, unique=True)
@@ -36,13 +36,13 @@ class Serie(SQLModel, table=True):
     __tablename__: str = "series" # type: ignore
 
     id: int | None = Field(default=None, primary_key=True)
-    title: str = Field(index=True)
+    title: str = Field(index=True, unique=True)
     image_url: str
-    source_url: str
-    owned_url: str
+    source_url: str = Field(unique=True)
+    owned_url: str = Field(unique=True)
     source_last_chapter: float
     owned_last_chapter: float
-    role_id: int
+    role_id: int = Field(unique=True)
     main_category_id: int
     translator_id: int | None = Field(default=None, foreign_key="users.id")
     proofreader_id: int | None = Field(default=None, foreign_key="users.id")
@@ -87,3 +87,5 @@ class Chapter(SQLModel, table=True):
     quality_checked_at: datetime | None = Field(default=None)
 
     closer_id: int | None = Field(default=None, foreign_key="users.id")
+
+    notification_sent: bool = Field(default=False)
