@@ -1,10 +1,10 @@
-from passlib.context import CryptContext
-from sqlmodel import create_engine, Session
-from ..models.user import UserInDB, RoleInDiscord, RoleInWebsite # noqa
-from ..dependencies.auth import DatabaseDep
-from sqlmodel import SQLModel, select
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
+
 import jwt
+from passlib.context import CryptContext
+from sqlmodel import Session, SQLModel, create_engine, select
+
+from app.models.user import RoleInDiscord, RoleInWebsite, UserInDB  # noqa
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
@@ -67,10 +67,10 @@ def create_database():
     db_session.close()
     
 
-def get_user(db: DatabaseDep, username: str | None):
+def get_user(db: Session, username: str | None):
     return db.exec(select(UserInDB).where(UserInDB.username == username)).first()
 
-def authenticate_user(db: DatabaseDep, username: str, password: str):
+def authenticate_user(db: Session, username: str, password: str):
     user = get_user(db, username)
     if not user:
         return False

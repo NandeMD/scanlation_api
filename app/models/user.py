@@ -1,5 +1,7 @@
-from sqlmodel import SQLModel, Field
 from enum import Enum
+
+from sqlmodel import Column, Field, PickleType, SQLModel
+
 
 class RoleInWebsite(str, Enum):
     NORMAL = "normal"
@@ -20,7 +22,7 @@ class User(SQLModel):
     email: str = Field(index=True, unique=True)
     discord_id: str = Field(index=True, unique=True)
     role_in_website: RoleInWebsite = Field(default=RoleInWebsite.NORMAL)
-    role_in_discord: list[RoleInDiscord]
+    role_in_discord: list[RoleInDiscord] = Field(sa_column=Column(PickleType))
     is_active: bool = Field(default=True)
     
 class UserInDB(User, table=True):

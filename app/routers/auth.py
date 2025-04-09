@@ -1,9 +1,13 @@
+from datetime import timedelta
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from typing import Annotated
-from ..helpers.auth import authenticate_user, create_access_token
+
+from app.dependencies.helpers.auth import (authenticate_user,
+                                           create_access_token)
+
 from ..dependencies.auth import DatabaseDep
-from datetime import timedelta
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
