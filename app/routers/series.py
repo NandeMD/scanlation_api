@@ -6,7 +6,7 @@ from hoarder import match_manga_source
 
 from ..dependencies.auth import CurrentUserDep, DatabaseDep
 from ..models.db_tables import RoleInWebsite, Serie
-from ..models.series import NewSerieRequest, NewSeriesManualRequest
+from ..models.series import NewSerieRequest, NewSeriesManualRequest, UpdateSerieRequest
 
 series_router = APIRouter(prefix="/series", tags=["series"])
 
@@ -147,3 +147,51 @@ async def new_manual_serie(
     db.refresh(new_serie)
 
     return new_serie
+
+
+@series_router.delete("/delete/{serie_id}", response_class=ORJSONResponse)
+async def delete_serie(
+    current_user: CurrentUserDep,
+    db: DatabaseDep,
+    serie_id: int,
+) -> dict:
+    usr_role = current_user.role_in_website
+
+    if usr_role != RoleInWebsite.ADMIN and usr_role != RoleInWebsite.SUPER:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    serie = db.get(Serie, serie_id)
+
+    if serie is None:
+        raise HTTPException(status_code=404, detail="Serie not found")
+
+    db.delete(serie)
+    db.commit()
+
+    return {"detail": "Serie deleted"}
+
+
+@series_router.put("/update", response_class=ORJSONResponse)
+async def update_serie(
+    current_user: CurrentUserDep,
+    db: DatabaseDep,
+    serie: UpdateSerieRequest,
+) -> Serie:
+    usr_role = current_user.role_in_website
+
+    if usr_role != RoleInWebsite.ADMIN and usr_role != RoleInWebsite.SUPER:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    db_serie = db.get(Serie, serie.serie_id)
+
+    if db_serie is None:
+        raise HTTPException(status_code=404, detail="Serie not found")
+
+    for key, value in serie.model_dump(exclude_unset=True).items():
+        setattr(db_serie, key, value)
+
+    db.add(db_serie)
+    db.commit()
+    db.refresh(db_serie)
+
+    return db_serie

@@ -31,3 +31,22 @@ class NewSeriesManualRequest(BaseModel):
     typesetter_id: int | None = None
     quality_checker_id: int | None = None
     drive_url: str | None = None
+
+
+class UpdateSerieRequest(BaseModel):
+    serie_id: int
+    title: str | None = None
+    image_url: str | None = None
+    source_url: str | None = None
+    owned_url: str | None = None
+    source_last_chapter: int | None = None
+    owned_last_chapter: int | None = None
+    role_id: int | None = None
+    main_category_id: int | None = None
+
+    translator_id: int | None = None
+    proofreader_id: int | None = None
+    cleaner_id: int | None = None
+    typesetter_id: int | None = None
+    quality_checker_id: int | None = None
+    drive_url: str | None = None
