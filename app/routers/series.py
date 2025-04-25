@@ -5,8 +5,11 @@ from sqlmodel import or_, select
 from hoarder import match_manga_source
 
 from ..dependencies.auth import CurrentUserDep, DatabaseDep
+from ..dependencies.helpers.series import (add_new_manual_serie_chapters,
+                                           add_new_serie_chapters)
 from ..models.db_tables import RoleInWebsite, Serie
-from ..models.series import NewSerieRequest, NewSeriesManualRequest, UpdateSerieRequest
+from ..models.series import (NewSerieRequest, NewSeriesManualRequest,
+                             UpdateSerieRequest)
 
 series_router = APIRouter(prefix="/series", tags=["series"])
 
@@ -114,6 +117,8 @@ async def new_serie(
     db.commit()
     db.refresh(new_serie)
 
+    add_new_serie_chapters(db, new_serie, owned_result.chapters, source_result.chapters)
+
     return new_serie
 
 
@@ -145,6 +150,14 @@ async def new_manual_serie(
     db.add(new_serie)
     db.commit()
     db.refresh(new_serie)
+
+    add_new_manual_serie_chapters(
+        1,
+        serie.owned_last_chapter,
+        serie.source_last_chapter,
+        db,
+        new_serie,
+    )
 
     return new_serie
 
