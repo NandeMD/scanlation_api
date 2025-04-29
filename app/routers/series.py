@@ -1,15 +1,17 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import ORJSONResponse
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import or_, select
 
 from hoarder import match_manga_source
 
 from ..dependencies.auth import CurrentUserDep, DatabaseDep
-from ..dependencies.helpers.series import (add_new_manual_serie_chapters,
-                                           add_new_serie_chapters)
+from ..dependencies.helpers.series import (
+    add_new_manual_serie_chapters,
+    add_new_serie_chapters,
+)
 from ..models.db_tables import RoleInWebsite, Serie
-from ..models.series import (NewSerieRequest, NewSeriesManualRequest,
-                             UpdateSerieRequest)
+from ..models.series import NewSerieRequest, NewSeriesManualRequest, UpdateSerieRequest
 
 series_router = APIRouter(prefix="/series", tags=["series"])
 
@@ -113,9 +115,12 @@ async def new_serie(
         quality_checker_id=serie.quality_checker_id,
         drive_url=serie.drive_url,
     )
-    db.add(new_serie)
-    db.commit()
-    db.refresh(new_serie)
+    try:
+        db.add(new_serie)
+        db.commit()
+        db.refresh(new_serie)
+    except IntegrityError:
+        raise HTTPException(status_code=400, detail="Serie already exists!")
 
     add_new_serie_chapters(db, new_serie, owned_result.chapters, source_result.chapters)
 
@@ -203,8 +208,11 @@ async def update_serie(
     for key, value in serie.model_dump(exclude_unset=True).items():
         setattr(db_serie, key, value)
 
-    db.add(db_serie)
-    db.commit()
-    db.refresh(db_serie)
+    try:
+        db.add(db_serie)
+        db.commit()
+        db.refresh(db_serie)
+    except IntegrityError:
+        raise HTTPException(status_code=400, detail="Serie already exists!")
 
     return db_serie
