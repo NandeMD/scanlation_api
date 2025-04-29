@@ -152,9 +152,12 @@ async def new_manual_serie(
         quality_checker_id=serie.quality_checker_id,
         drive_url=serie.drive_url,
     )
-    db.add(new_serie)
-    db.commit()
-    db.refresh(new_serie)
+    try:
+        db.add(new_serie)
+        db.commit()
+        db.refresh(new_serie)
+    except IntegrityError:
+        raise HTTPException(status_code=400, detail="Serie already exists!")
 
     add_new_manual_serie_chapters(
         1,
