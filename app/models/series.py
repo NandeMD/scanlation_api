@@ -34,7 +34,7 @@ class NewSeriesManualRequest(BaseModel):
 
 
 class UpdateSerieRequest(BaseModel):
-    serie_id: int
+    id: int
     title: str | None = None
     image_url: str | None = None
     source_url: str | None = None

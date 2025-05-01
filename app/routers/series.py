@@ -6,12 +6,11 @@ from sqlmodel import or_, select
 from hoarder import match_manga_source
 
 from ..dependencies.auth import CurrentUserDep, DatabaseDep
-from ..dependencies.helpers.series import (
-    add_new_manual_serie_chapters,
-    add_new_serie_chapters,
-)
+from ..dependencies.helpers.series import (add_new_manual_serie_chapters,
+                                           add_new_serie_chapters)
 from ..models.db_tables import RoleInWebsite, Serie
-from ..models.series import NewSerieRequest, NewSeriesManualRequest, UpdateSerieRequest
+from ..models.series import (NewSerieRequest, NewSeriesManualRequest,
+                             UpdateSerieRequest)
 
 series_router = APIRouter(prefix="/series", tags=["series"])
 
@@ -203,7 +202,7 @@ async def update_serie(
     if usr_role != RoleInWebsite.ADMIN and usr_role != RoleInWebsite.SUPER:
         raise HTTPException(status_code=403, detail="Forbidden")
 
-    db_serie = db.get(Serie, serie.serie_id)
+    db_serie = db.get(Serie, serie.id)
 
     if db_serie is None:
         raise HTTPException(status_code=404, detail="Serie not found")
