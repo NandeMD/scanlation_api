@@ -19,12 +19,11 @@ series_router = APIRouter(prefix="/series", tags=["series"])
 async def get_series(
     current_user: CurrentUserDep,
     db: DatabaseDep,
-    limit: int = 100,
 ) -> list[Serie]:
     usr_role = current_user.role_in_website
 
     if usr_role == RoleInWebsite.ADMIN or usr_role == RoleInWebsite.SUPER:
-        query = select(Serie).limit(limit)
+        query = select(Serie)
     else:
         query = (
             select(Serie)
@@ -37,7 +36,6 @@ async def get_series(
                     Serie.quality_checker_id == current_user.discord_id,
                 )
             )
-            .limit(limit)
         )
 
     series = db.exec(query)
